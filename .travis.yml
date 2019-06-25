@@ -46,7 +46,7 @@ jobs:
         - tests/setup_tests.sh
       deploy:
         on:
-          tags: true
+          # tags: true
           all_branches: true
           draft: true
           repo: matyasselmeci/htcondor-ce
