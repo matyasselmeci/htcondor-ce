@@ -113,6 +113,11 @@ fi
 # Prepare the RPM environment
 mkdir -p /tmp/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
 
+cat >> /etc/rpm/macros.dist << EOF
+%dist .${BUILD_ENV}.el${OS_VERSION}
+%${BUILD_ENV} 1
+EOF
+
 cp htcondor-ce/rpm/htcondor-ce.spec /tmp/rpmbuild/SPECS
 package_version=`grep Version htcondor-ce/rpm/htcondor-ce.spec | awk '{print $2}'`
 pushd htcondor-ce
@@ -120,17 +125,8 @@ git archive --format=tar --prefix=htcondor-ce-${package_version}/ HEAD | \
     gzip > /tmp/rpmbuild/SOURCES/htcondor-ce-${package_version}.tar.gz
 popd
 
-# Build the SRPM; do this before adding a dist tag
-rpmbuild --define '_topdir /tmp/rpmbuild' -bs /tmp/rpmbuild/SPECS/htcondor-ce.spec
-
-# Add the dist tag
-cat >> /etc/rpm/macros.dist << EOF
-%dist .${BUILD_ENV}.el${OS_VERSION}
-%${BUILD_ENV} 1
-EOF
-
-# Build the binary RPMs
-rpmbuild --define '_topdir /tmp/rpmbuild' -bb /tmp/rpmbuild/SPECS/htcondor-ce.spec
+# Build the RPM
+rpmbuild --define '_topdir /tmp/rpmbuild' -ba /tmp/rpmbuild/SPECS/htcondor-ce.spec
 
 if $DEPLOY_STAGE; then
     # dir needs to be inside htcondor-ce so it's visible outside the container
