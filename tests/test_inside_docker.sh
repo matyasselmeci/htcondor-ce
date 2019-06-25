@@ -125,8 +125,10 @@ git archive --format=tar --prefix=htcondor-ce-${package_version}/ HEAD | \
     gzip > /tmp/rpmbuild/SOURCES/htcondor-ce-${package_version}.tar.gz
 popd
 
-# Build the RPM
-rpmbuild --define '_topdir /tmp/rpmbuild' -ba /tmp/rpmbuild/SPECS/htcondor-ce.spec
+# Build the SRPM; don't put a dist tag in it
+rpmbuild --define '_topdir /tmp/rpmbuild' --undefine dist -bs /tmp/rpmbuild/SPECS/htcondor-ce.spec
+# Build the binary RPM
+rpmbuild --define '_topdir /tmp/rpmbuild' -bb /tmp/rpmbuild/SPECS/htcondor-ce.spec
 
 if $DEPLOY_STAGE; then
     # dir needs to be inside htcondor-ce so it's visible outside the container
