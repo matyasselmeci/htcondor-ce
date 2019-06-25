@@ -129,15 +129,16 @@ popd
 rpmbuild --define '_topdir /tmp/rpmbuild' -ba /tmp/rpmbuild/SPECS/htcondor-ce.spec
 
 if $DEPLOY_STAGE; then
-    mkdir -p /travis_deploy
-    cp -f /tmp/rpmbuild/RPMS/*/*.rpm /travis_deploy/
+    # dir needs to be inside htcondor-ce so it's visible outside the container
+    mkdir -p htcondor-ce/travis_deploy
+    cp -f /tmp/rpmbuild/RPMS/*/*.rpm htcondor-ce/travis_deploy/
     # HACK: only deploy the common file(s) (SRPM) on one env set
     # to avoid attempting to overwrite the GitHub build products
     # (which would raise an error).
     # `overwrite: true` in .travis.yml ought to fix that but doesn't
     # appear to.
     if [[ $OS_VERSION == 6 ]]; then
-        cp -f /tmp/rpmbuild/SRPMS/*.rpm /travis_deploy/
+        cp -f /tmp/rpmbuild/SRPMS/*.rpm htcondor-ce/travis_deploy/
     fi
     exit 0
 fi
