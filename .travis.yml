@@ -16,15 +16,15 @@ jobs:
         - sudo docker pull centos:centos${OS_VERSION}
       script:
         - tests/setup_tests.sh
-    - <<: *run_tests
-      env:
-        - OS_TYPE=centos OS_VERSION=7 BUILD_ENV=uw_build DEPLOY_STAGE=false
-    - <<: *run_tests
-      env:
-        - OS_TYPE=centos OS_VERSION=6 BUILD_ENV=osg DEPLOY_STAGE=false
-    - <<: *run_tests
-      env:
-        - OS_TYPE=centos OS_VERSION=7 BUILD_ENV=osg DEPLOY_STAGE=false
+    # - <<: *run_tests
+    #   env:
+    #     - OS_TYPE=centos OS_VERSION=7 BUILD_ENV=uw_build DEPLOY_STAGE=false
+    # - <<: *run_tests
+    #   env:
+    #     - OS_TYPE=centos OS_VERSION=6 BUILD_ENV=osg DEPLOY_STAGE=false
+    # - <<: *run_tests
+    #   env:
+    #     - OS_TYPE=centos OS_VERSION=7 BUILD_ENV=osg DEPLOY_STAGE=false
 
     - &deploy_rpm
       # Template; subsequent uses modify 'env'
