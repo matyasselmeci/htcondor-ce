@@ -24,7 +24,7 @@ jobs:
           skip_cleanup: true
           script: tests/sftp_upload.sh
           on:
-            repo: htcondor/htcondor-ce
+            repo: matyasselmeci/htcondor-ce
             tags: true
     - <<: *run_tests
       env:
@@ -34,7 +34,7 @@ jobs:
           skip_cleanup: true
           script: tests/sftp_upload.sh
           on:
-            repo: htcondor/htcondor-ce
+            repo: matyasselmeci/htcondor-ce
             tags: true
     - <<: *run_tests
       env:
