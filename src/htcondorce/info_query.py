@@ -23,8 +23,10 @@ class ResourceAd(classad.ClassAd):
         self.ce_ad         = ce_ad
         self.catalog_entry = catalog_entry
 
-        for cekey in ['OSG_Resource', 'OSG_ResourceGroup', 'OSG_BatchSystems']:
+        for cekey in ['OSG_Resource', 'OSG_BatchSystems']:
             self[cekey] = ce_ad[cekey]
+        if "OSG_ResourceGroup" in ce_ad:
+            self["OSG_ResourceGroup"] = ce_ad["OSG_ResourceGroup"]
         self['grid_resource'] = ce_ad['grid_resource'].eval()
 
         for catkey, catval in catalog_entry.items():
@@ -73,7 +75,7 @@ def fetchCEAds(collector_addr):
     attributes we want to examine
 
     """
-    required_attrs = ['OSG_Resource', 'OSG_ResourceGroup', 'OSG_ResourceCatalog', 'OSG_BatchSystems', 'grid_resource']
+    required_attrs = ['OSG_Resource', 'OSG_ResourceCatalog', 'OSG_BatchSystems', 'grid_resource']
     constraint     = '! (%s)' % ' || '.join(["isUndefined("+x+")" for x in required_attrs])
     collector      = htcondor.Collector(collector_addr)
     ads            = collector.query(htcondor.AdTypes.Any, constraint)
