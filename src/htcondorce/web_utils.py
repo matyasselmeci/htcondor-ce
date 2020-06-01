@@ -168,6 +168,9 @@ def agis_data(environ):
             }
             results['ce_services'][ad['OSG_Resource']] = ce_ad
             results['queues'][ad['OSG_Resource']] = default_queue_ad
+            resource_catalog = ad.get("ResourceCatalog", ad.get("OSG_ResourceCatalog", None))
+            if resource_catalog is None:
+                raise KeyError("Neither ResourceCatalog nor OSG_ResourceCatalog found in ad")
             queue_ad = generate_queue_ad(ad['OSG_ResourceCatalog'], ad['OSG_Resource'])
             if queue_ad:
                 results['queues'][ad['OSG_Resource']] = queue_ad
