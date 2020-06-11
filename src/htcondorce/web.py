@@ -19,6 +19,7 @@ import htcondorce.web_utils
 _initialized = None
 _loader = None
 _view = None
+_plugins = []
 g_is_multice = False
 OK_STATUS = '200 OK'
 
@@ -26,7 +27,8 @@ def check_initialized(environ):
     global _initialized
     global _loader
     global _cp
-    global htcondor
+    global _plugins
+
     if not _initialized:
         if 'htcondorce.templates' in environ:
             _loader = genshi.template.TemplateLoader(environ['htcondorce.templates'], auto_reload=True)
@@ -34,6 +36,17 @@ def check_initialized(environ):
             _loader = genshi.template.TemplateLoader('/usr/share/condor-ce/templates', auto_reload=True)
         ce_config = environ.get('htcondorce.config', '/etc/condor-ce/condor_config')
         htcondor = htcondorce.web_utils.check_htcondor()
+
+        plugins_dir = htcondor.param.get("HTCONDORCE_VIEW_PLUGINS_DIR", "/usr/share/condor-ce/ceview-plugins")
+        if os.path.isdir(plugins_dir):
+            import imp
+            for filename in sorted(os.listdir(plugins_dir)):
+                if not filename.endswith(".py"):
+                    continue
+                plugin = imp.load_source(filename[:-3], os.path.join(plugins_dir, filename))
+                if hasattr(plugin, "urls"):
+                    _plugins.append(plugin)
+
         _initialized = True
 
 
@@ -351,10 +364,19 @@ def application(environ, start_response):
     check_initialized(environ)
 
     path = environ.get('PATH_INFO', '').lstrip('/')
-    
+
+    for plugin in _plugins:
+        # TODO Catch errors
+        for regex, callback in plugin.urls:
+            match = regex.match(path)
+            if match:
+                environ['htcondorce.url_args'] = match.groups()
+                return callback(environ, start_response)
+
     for regex, callback in urls:
         match = regex.match(path)
         if match:
             environ['htcondorce.url_args'] = match.groups()
             return callback(environ, start_response)
+
     return not_found(environ, start_response)
