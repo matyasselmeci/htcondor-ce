@@ -2,8 +2,8 @@
 #define gitrev osg
 
 Name: htcondor-ce
-Version: 4.3.0
-Release: 2%{?gitrev:.%{gitrev}git}%{?dist}
+Version: 4.3.99
+Release: 1%{?gitrev:.%{gitrev}git}%{?dist}
 Summary: A framework to run HTCondor as a CE
 BuildArch: noarch
 
@@ -200,6 +200,7 @@ make %{?_smp_mflags}
 
 %install
 make install DESTDIR=$RPM_BUILD_ROOT
+install -d $RPM_BUILD_ROOT/%{_datadir}/condor-ce/ceview-plugins
 
 %if 0%{?osg}
 rm -rf $RPM_BUILD_ROOT%{_datadir}/condor-ce/htcondor-ce-provider
@@ -212,6 +213,7 @@ rm -f $RPM_BUILD_ROOT%{_datadir}/condor-ce/config.d/50-ce-apel-defaults.conf
 rm -f $RPM_BUILD_ROOT%{_datadir}/condor-ce/condor_blah.sh
 rm -f $RPM_BUILD_ROOT%{_datadir}/condor-ce/condor_batch.sh
 rm -f $RPM_BUILD_ROOT%{_datadir}/condor-ce/condor_ce_apel.sh
+install -m 0644 src/htcondorce/plugins/hello.py $RPM_BUILD_ROOT/%{_datadir}/condor-ce/ceview-plugins/hello.py
 %else
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/bdii/gip/provider
 mv $RPM_BUILD_ROOT%{_datadir}/condor-ce/htcondor-ce-provider \
@@ -378,6 +380,12 @@ fi
 %attr(-,condor,condor) %dir %{_localstatedir}/lib/condor-ce/spool/ceview/vos
 %attr(-,condor,condor) %dir %{_localstatedir}/lib/condor-ce/spool/ceview/metrics
 
+%dir %{_datadir}/condor-ce/ceview-plugins
+
+%if 0%{?osg}
+%{_datadir}/condor-ce/ceview-plugins/hello.py*
+%endif
+
 %files condor
 %defattr(-,root,root,-)
 
@@ -494,6 +502,9 @@ fi
 %{_localstatedir}/www/wsgi-scripts/htcondor-ce/htcondor-ce-registry.wsgi
 
 %changelog
+* Thu Jun 11 2020 Mátyás Selmeci <matyas@cs.wisc.edu> - 4.3.99-1
+- Add plugins
+
 * Wed May 27 2020 Brian Lin <blin@cs.wisc.edu> - 4.3.0-2
 - Update the packaging for 4.3.0
 
