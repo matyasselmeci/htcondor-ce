@@ -28,6 +28,7 @@ def check_initialized(environ):
     global _loader
     global _cp
     global _plugins
+    global htcondor
 
     if not _initialized:
         if 'htcondorce.templates' in environ:
