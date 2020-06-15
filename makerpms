@@ -15,6 +15,7 @@ help:
 	$(echo) "Targets:"
 	$(echo)
 	$(echotbl) "rpmbuild"  "Run a local RPM build"
+	$(echotbl) "uwrpmbuild" "Run a local RPM build, uw_build style"
 	$(echotbl) "kojiscratch" "Run a koji scratch build"
 	$(echo)
 #	$(echo) "Variables:"
@@ -28,6 +29,10 @@ upstream/test.source: .git/index
 
 rpmbuild: upstream/test.source
 	osg-build rpmbuild
+
+uwrpmbuild: upstream/test.source
+	osg-build prebuild
+	rpmbuild -Ddist\ .uw -Duw_build\ 1 -Dosg\ 0 -Del7\ 1 -Drhel\ 7 --rebuild _final_srpm_contents/*.src.rpm
 
 kojiscratch: upstream/test.source
 	osg-build koji --scratch --getfiles
